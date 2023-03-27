@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> xyq 的 flappy bird</title>
+</head>
+
+<body>
+    <div id="gameboard" onclick="jump()">
+        <img id="Mybird" src="bird.gif" />
+
+</body>
+<script src="setting.js" type="text/javascript"></script>
+<style>
+    #gameboard {
+        background-image: url(back.jpeg);
+        background-position: center;
+        background-size:cover;
+        width: 1000px;
+        height: 800px;
+        position: absolute;
+        left: 200px;
+        overflow: hidden;
+    }
+
+    .block {
+        background-color: green;
+        width: 60px;
+        position: absolute;
+        left: 1000px;
+        height: 400px;
+
+    }
+
+    #Mybird {
+        color: red;
+        background-color: red;
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        left: 200px;
+        border-radius: 200px;
+        -webkit-user-select: none;
+    }
+</style>
+<script type="text/javascript">
+    var treelist = []
+    var bird = document.getElementById('Mybird')
+    var game_board = document.getElementById('gameboard')
+    var mybird = {
+        y: mybird_default_y,
+        v: 0,
+        g: mybird_default_g,
+    };
+    static_block_id = 0;
+    class Block {
+        id = "block_";
+        x = 1000;
+        type = 1;
+        height = 0;
+    }
+    jBlock_list = []
+    live_Block_list = []
+    loop_time = 0
+    function main_loop() {
+        loop_time += 1;
+        move()
+        render()
+        if (loop_time % block_create_interval == 0) {
+            create_block()
+        }
+
+    }
+    function move() {
+        // 移动鸟
+        mybird.y = mybird.y + mybird.v
+        if (mybird.y >= game_window_height)
+            mybird.y = game_window_height
+        mybird.v = mybird.v + mybird.g;
+        // 移动柱子
+        for (var i = 0; i < jBlock_list.length; i++) {
+            b = document.getElementById(jBlock_list[i].id)
+            b.style.left = String(jBlock_list[i].x) + 'px'
+            jBlock_list[i].x += block_default_v
+            if (jBlock_list[i].x >= 0) {
+                live_Block_list.push(jBlock_list[i])
+            }
+            else{
+                b.remove()
+            }
+
+        }
+        jBlock_list = live_Block_list;
+        live_Block_list =[]
+
+    }
+    function create_block() {
+        all_height = game_window_height - block_space_interval
+        random_v = Math.random()
+        // 创建上方柱子
+        let nblock = new Block()
+        nblock.id = "block_" + String(static_block_id)
+        static_block_id += 1
+        nblock.type = 0;
+        nblock.height = random_v * all_height
+        nblock.x = game_window_width
+        jBlock_list.push(nblock)
+
+        cb = document.createElement('div');
+        cb.setAttribute('id', nblock.id)
+        console.log(cb.id)
+        cb.style.top = 0
+        cb.style.left = cb.x
+        cb.style.height = String(nblock.height) + 'px';
+        cb.classList.add('block')
+        game_board.appendChild(cb)
+        // 创建下方柱子
+        nblock = new Block()
+        nblock.id = "block_" + String(static_block_id)
+        static_block_id += 1
+        nblock.type = 0;
+        nblock.height = (1 - random_v) * all_height
+        nblock.x = game_window_width
+        jBlock_list.push(nblock)
+
+        cb = document.createElement('div');
+        cb.setAttribute('id', nblock.id)
+        console.log(cb.id)
+        cb.style.bottom = 0
+        cb.style.left = cb.x
+        cb.style.height = String(nblock.height) + 'px';
+        cb.classList.add('block')
+        game_board.appendChild(cb)
+    }
+
+    function jump(evnet) {
+        mybird.v = mybird_jump_v;
+    }
+    function render() {
+        bird.style.top = String(mybird.y) + 'px';
+    }
+    setInterval(main_loop, render_frequecy)
+</script>
+
+</html>
